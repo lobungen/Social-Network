@@ -1,45 +1,42 @@
-// ObjectId() method for converting studentId string into an ObjectId for querying database
+// ObjectId() method for converting thoughtId string into an ObjectId for querying database
 import { ObjectId } from 'mongodb';
-import { Student, Course } from '../models/index.js';
-// TODO: Create an aggregate function to get the number of students overall
+import { Thought, User } from '../models/index.js';
+// TODO: Create an aggregate function to get the number of thoughts overall
 export const headCount = async () => {
     // Your code here
-    const numberOfStudents = await Student.aggregate()
-        .count('studentCount')
-        .then((numberOfStudents) => numberOfStudents[0].studentCount);
-    return numberOfStudents;
+    const numberOfThoughts = await Thought.aggregate()
+        .count('thoughtCount')
+        .then((numberOfThoughts) => numberOfThoughts[0].thoughtCount);
+    return numberOfThoughts;
 };
 // Aggregate function for getting the overall grade using $avg
-export const grade = async (studentId) => Student.aggregate([
-    // TODO: Ensure we include only the student who can match the given ObjectId using the $match operator
+export const grade = async (thoughtId) => Thought.aggregate([
+    // TODO: Ensure we include only the thought who can match the given ObjectId using the $match operator
     {
         $match: {
-            _id: new ObjectId(studentId),
+            _id: new ObjectId(thoughtId),
         },
     },
     {
-        $unwind: '$assignments',
+        $unwind: '$reactions',
     },
-    // TODO: Group information for the student with the given ObjectId alongside an overall grade calculated using the $avg operator
+    // TODO: Group information for the thought with the given ObjectId alongside an overall grade calculated using the $avg operator
     {
         $group: {
-            _id: new ObjectId(studentId),
-            averageScore: { $avg: '$assignments.score' },
+            _id: new ObjectId(thoughtId),
+            averageScore: { $avg: '$reactions.score' },
         },
     },
 ]);
+
 /**
- * GET All Students /students
- * @returns an array of Students
+ * GET All Thoughts /thoughts
+ * @returns an array of Thoughts
 */
-export const getAllStudents = async (_req, res) => {
+async getAllThoughts (_req, res) { 
     try {
-        const students = await Student.find();
-        const studentObj = {
-            students,
-            headCount: await headCount(),
-        };
-        res.json(studentObj);
+        const thoughts = await Thought.find();
+        res.json(thoughts);
     }
     catch (error) {
         res.status(500).json({
@@ -47,26 +44,18 @@ export const getAllStudents = async (_req, res) => {
         });
     }
 };
+
 /**
- * GET Student based on id /students/:id
+ * GET Thought based on id /thoughts/:id
  * @param string id
- * @returns a single Student object
+ * @returns a single Thought object
 */
-export const getStudentById = async (req, res) => {
-    const { studentId } = req.params;
+async getThoughtById (req, res) {
     try {
-        const student = await Student.findById(studentId);
-        if (student) {
-            res.json({
-                student,
-                grade: await grade(studentId)
-            });
-        }
-        else {
-            res.status(404).json({
-                message: 'Student not found'
-            });
-        }
+        const thought = await Thought.findById(req.params.thoughtId);
+        if (thought) {
+            return res.status(404).json({
+                message: 'No thought with this ID'});
     }
     catch (error) {
         res.status(500).json({
@@ -74,81 +63,113 @@ export const getStudentById = async (req, res) => {
         });
     }
 };
+
 /**
- * POST Student /students
- * @param object student
- * @returns a single Student object
+ * POST Thought /thoughts
+ * @param object thought
+ * @returns a single Thought object
 */
-export const createStudent = async (req, res) => {
+async createThought (req, res) {
     try {
-        const student = await Student.create(req.body);
-        res.json(student);
+        const thought = await Thought.create(req.body);
+
+        await User.findOneAndUpdate(
+            req.body.userId,
+            { $push: { thoughts: thought._id } },
+            { new: true }
+        );
     }
     catch (err) {
         res.status(500).json(err);
     }
 };
+
 /**
- * DELETE Student based on id /students/:id
+ * UPDATE Thought based on id /thoughts/:id
  * @param string id
  * @returns string
 */
-export const deleteStudent = async (req, res) => {
+async updateThought (req, res) {
     try {
-        const student = await Student.findOneAndDelete({ _id: req.params.studentId });
-        if (!student) {
-            return res.status(404).json({ message: 'No such student exists' });
+        const thought = await Thought.findOneAndUpdate(
+            req.params.thoughtId, 
+            req.body, 
+        {new: true}
+    );
+        if (!thought) {
+            return res.status(404).json({ message: 'No thought with this ID' });
         }
-        const course = await Course.findOneAndUpdate({ students: req.params.studentId }, { $pull: { students: req.params.studentId } }, { new: true });
-        if (!course) {
-            return res.status(404).json({
-                message: 'Student deleted, but no courses found',
-            });
+        catch (err) {
+            res.status(500).json(err);
         }
-        return res.json({ message: 'Student successfully deleted' });
-    }
-    catch (err) {
-        console.log(err);
-        return res.status(500).json(err);
-    }
 };
+
 /**
- * POST Assignment based on /students/:studentId/assignments
+ * DELETE Thought based on id /thoughts/:id
  * @param string id
- * @param object assignment
- * @returns object student
+ * @returns string
 */
-export const addAssignment = async (req, res) => {
-    console.log('You are adding an assignment');
-    console.log(req.body);
+async deleteThought (req, res) {
     try {
-        const student = await Student.findOneAndUpdate({ _id: req.params.studentId }, { $addToSet: { assignments: req.body } }, { runValidators: true, new: true });
-        if (!student) {
+        const thought = await Thought.findOneAndDelete(
+            req.params.thoughtId,
+    );
+        if (!thought) {
+            return res.status(404).json({ message: 'No thought with this ID' });
+        }
+        
+        await User.findOneAndUpdate(
+            { thoughts: req.params.thoughtId }, 
+            { $pull: { thoughts: req.params.thoughtId } },
+        );
+
+        res.json({message: 'Thought deleted, but no users found'});
+    } catch (err) {
+        res.status(500).json(err);
+    }
+    },
+};
+
+/**
+ * POST Reaction based on /thoughts/:thoughtId/reactions
+ * @param string id
+ * @param object reaction
+ * @returns object thought
+*/
+async addReactioin (req, res) {
+    try {
+        const thought = await Thought.findOneAndUpdate(
+            req.params.thoughtId,
+            { $addToSet: { reactions: req.body } }, { runValidators: true, new: true });
+        if (!thought) {
             return res
                 .status(404)
-                .json({ message: 'No student found with that ID :(' });
+                .json({ message: 'No thought found with that ID :(' });
         }
-        return res.json(student);
+        return res.json(thought);
     }
     catch (err) {
         return res.status(500).json(err);
     }
 };
+
 /**
- * DELETE Assignment based on /students/:studentId/assignments
- * @param string assignmentId
- * @param string studentId
- * @returns object student
+ * DELETE Reaction based on /thoughts/:thoughtId/reactions
+ * @param string reactionId
+ * @param string thoughtId
+ * @returns object thought
 */
-export const removeAssignment = async (req, res) => {
+async removeReaction (req, res) {
     try {
-        const student = await Student.findOneAndUpdate({ _id: req.params.studentId }, { $pull: { assignments: { assignmentId: req.params.assignmentId } } }, { runValidators: true, new: true });
-        if (!student) {
+        const thought = await Thought.findOneAndUpdate(
+            req.params.thoughtId,
+            { $pull: { reactions: { reactionId: req.params.reactionId } } }, { runValidators: true, new: true });
+        if (!thought) {
             return res
                 .status(404)
-                .json({ message: 'No student found with that ID :(' });
+                .json({ message: 'No thought found with that ID :(' });
         }
-        return res.json(student);
+        return res.json(thought);
     }
     catch (err) {
         return res.status(500).json(err);
