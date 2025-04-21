@@ -1,21 +1,21 @@
 import { Schema, Types, model, type Document } from 'mongoose';
 
-interface IAssignment extends Document {
-    assignmentId: Schema.Types.ObjectId,
+interface IReaction extends Document {
+    reactionId: Schema.Types.ObjectId,
     name: string,
     score: number
 }
 
-interface IStudent extends Document {
+interface IThought extends Document {
     first: string,
     last: string,
     github: string,
-    assignments: Schema.Types.ObjectId[]
+    reactions: Schema.Types.ObjectId[]
 }
 
-const assignmentSchema = new Schema<IAssignment>(
+const reactionSchema = new Schema<IReaction>(
     {
-        assignmentId: {
+        reactionId: {
             type: Schema.Types.ObjectId,
             default: () => new Types.ObjectId(),
         },
@@ -24,7 +24,7 @@ const assignmentSchema = new Schema<IAssignment>(
             required: true,
             maxlength: 50,
             minlength: 4,
-            default: 'Unnamed assignment',
+            default: 'Unnamed reaction',
         },
         score: {
             type: Number,
@@ -38,7 +38,7 @@ const assignmentSchema = new Schema<IAssignment>(
     }
 );
 
-const studentSchema = new Schema<IStudent>({
+const thoughtSchema = new Schema<IThought>({
     first: {
         type: String,
         required: true,
@@ -54,7 +54,7 @@ const studentSchema = new Schema<IStudent>({
         required: true,
         max_length: 50,
     },
-    assignments: [assignmentSchema],
+    reactions: [reactionSchema],
 },
     {
         toJSON: {
@@ -64,6 +64,6 @@ const studentSchema = new Schema<IStudent>({
     }
 );
 
-const Student = model('Student', studentSchema);
+const Thought = model('Thought', thoughtSchema);
 
-export default Student;
+export default Thought;

@@ -1,14 +1,14 @@
 import { Schema, model, type Document } from 'mongoose';
 
-interface ICourse extends Document {
+interface IUser extends Document {
     name: string,
     inPerson: boolean,
     start: Date,
     end: Date,
-    students: Schema.Types.ObjectId[]
+    thoughts: Schema.Types.ObjectId[]
 }
 
-const courseSchema = new Schema<ICourse>(
+const userSchema = new Schema<IUser>(
     {
         name: {
             type: String,
@@ -27,10 +27,10 @@ const courseSchema = new Schema<ICourse>(
             // Sets a default value of 12 weeks from now
             default: () => new Date(+new Date() + 84 * 24 * 60 * 60 * 1000),
         },
-        students: [
+        thoughts: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'student',
+                ref: 'thought',
             },
         ],
     },
@@ -42,6 +42,6 @@ const courseSchema = new Schema<ICourse>(
     },
 );
 
-const Course = model<ICourse>('Course', courseSchema);
+const User = model<IUser>('User', userSchema);
 
-export default Course;
+export default User;

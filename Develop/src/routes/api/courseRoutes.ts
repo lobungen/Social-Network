@@ -1,21 +1,21 @@
 import { Router } from 'express';
 const router = Router();
 import {
-  getAllCourses,
-  getCourseById,
-  createCourse,
-  updateCourse,
-  deleteCourse,
-} from '../../controllers/courseController.js';
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../../controllers/userController.js';
 
-// /api/courses
-router.route('/').get(getAllCourses).post(createCourse);
+// /api/users
+router.route('/').get(getAllUsers).post(createUser);
 
-// /api/courses/:courseId
+// /api/users/:userId
 router
-  .route('/:courseId')
-  .get(getCourseById)
-  .put(updateCourse)
-  .delete(deleteCourse);
+  .route('/:userId')
+  .get(getUserById)
+  .put(updateUser)
+  .delete(deleteUser);
 
-export { router as courseRouter };
+export { router as userRouter };
