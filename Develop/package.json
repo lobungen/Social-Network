@@ -1,0 +1,24 @@
+{
+  "name": "develop",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "npm run build && node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preseed": "npm run build",
+    "seed": "npm run preseed && node dist/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
