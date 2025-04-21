@@ -136,7 +136,7 @@ async deleteThought (req, res) {
  * @param object reaction
  * @returns object thought
 */
-async addReactioin (req, res) {
+async addReaction (req, res) {
     try {
         const thought = await Thought.findOneAndUpdate(
             req.params.thoughtId,
