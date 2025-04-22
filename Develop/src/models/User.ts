@@ -1,22 +1,26 @@
 import { Schema, model, type Document } from 'mongoose';
 
 interface IUser extends Document {
-    name: string,
-    inPerson: boolean,
+    username: string,
+    email: string,
     start: Date,
     end: Date,
     thoughts: Schema.Types.ObjectId[]
+    friends: Schema.Types.ObjectId[]
 }
 
 const userSchema = new Schema<IUser>(
     {
-        name: {
+        username: {
             type: String,
             required: true,
+            unique: true,
         },
-        inPerson: {
-            type: Boolean,
-            default: true,
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            match: [/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/, 'Please fill a valid email address'],
         },
         start: {
             type: Date,
@@ -30,7 +34,13 @@ const userSchema = new Schema<IUser>(
         thoughts: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'thought',
+                ref: 'Thought',
+            },
+        ],
+        friends: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
             },
         ],
     },

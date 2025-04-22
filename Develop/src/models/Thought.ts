@@ -2,14 +2,15 @@ import { Schema, Types, model, type Document } from 'mongoose';
 
 interface IReaction extends Document {
     reactionId: Schema.Types.ObjectId,
-    name: string,
-    score: number
+    reactionBody: string,
+    username: string,
+    createAt: Date,
 }
 
 interface IThought extends Document {
-    first: string,
-    last: string,
-    github: string,
+    thoughtText: string,
+    createAt: Date,
+    username: string,
     reactions: Schema.Types.ObjectId[]
 }
 
@@ -19,17 +20,18 @@ const reactionSchema = new Schema<IReaction>(
             type: Schema.Types.ObjectId,
             default: () => new Types.ObjectId(),
         },
-        name: {
+        reactionBody: {
             type: String,
             required: true,
-            maxlength: 50,
-            minlength: 4,
-            default: 'Unnamed reaction',
+            maxlength: 280,
         },
-        score: {
-            type: Number,
+        username: {
+            type: String,
             required: true,
-            default: () => Math.floor(Math.random() * (100 - 70 + 1) + 70),
+        },
+        createAt: {
+            type: Date,
+            default: () => new Date(+new Date() + 84 * 24 * 60 * 60 * 1000),
         },
     },
     {
@@ -39,20 +41,19 @@ const reactionSchema = new Schema<IReaction>(
 );
 
 const thoughtSchema = new Schema<IThought>({
-    first: {
+    thoughtText: {
         type: String,
         required: true,
-        max_length: 50,
+        max_length: 280,
+        min_length: 1,
     },
-    last: {
-        type: String,
-        required: true,
-        max_length: 50,
+    createAt: {
+        type: Date,
+        default: () => new Date(+new Date() + 84 * 24 * 60 * 60 * 1000),
     },
-    github: {
+    username: {
         type: String,
         required: true,
-        max_length: 50,
     },
     reactions: [reactionSchema],
 },

@@ -3,37 +3,6 @@ import { ObjectId } from 'mongodb';
 import { Thought, User } from '../models/index.js';
 import { Request, Response } from 'express';
 
-// TODO: Create an aggregate function to get the number of thoughts overall
-
-export const headCount = async () => {
-    // Your code here
-    const numberOfThoughts = await Thought.aggregate()
-        .count('thoughtCount')
-        .then((numberOfThoughts: any) => numberOfThoughts[0].thoughtCount);
-    return numberOfThoughts;
-}
-
-// Aggregate function for getting the overall grade using $avg
-export const grade = async (thoughtId: string) =>
-    Thought.aggregate([
-        // TODO: Ensure we include only the thought who can match the given ObjectId using the $match operator
-    {
-        $match: {
-            _id: new ObjectId(thoughtId),
-        },
-    },
-      {
-        $unwind: '$reactions',
-      },
-      // TODO: Group information for the thought with the given ObjectId alongside an overall grade calculated using the $avg operator
-      {
-        $group: {
-            _id: new ObjectId(thoughtId),
-            averageScore: { $avg: '$reactions.score' },
-          },
-        },
-      ]);
-
 /**
  * GET All Thoughts /thoughts
  * @returns an array of Thoughts
@@ -44,7 +13,6 @@ export const getAllThoughts = async (_req: Request, res: Response) => {
 
         const thoughtObj = {
             thoughts,
-            headCount: await headCount(),
         }
 
         res.json(thoughtObj);
@@ -67,7 +35,6 @@ export const getThoughtById = async (req: Request, res: Response) => {
         if (thought) {
             res.json({
                 thought,
-                grade: await grade(thoughtId)
             });
         } else {
             res.status(404).json({
@@ -106,7 +73,7 @@ export const deleteThought = async (req: Request, res: Response) => {
         const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
 
         if (!thought) {
-            return res.status(404).json({ message: 'No such thought exists' });
+            res.status(404).json({ message: 'No such thought exists' });
         }
 
         const user = await User.findOneAndUpdate(
@@ -116,15 +83,15 @@ export const deleteThought = async (req: Request, res: Response) => {
         );
 
         if (!user) {
-            return res.status(404).json({
+            res.status(404).json({
                 message: 'Thought deleted, but no users found',
             });
         }
 
-        return res.json({ message: 'Thought successfully deleted' });
+        res.json({ message: 'Thought successfully deleted' });
     } catch (err) {
         console.log(err);
-        return res.status(500).json(err);
+        res.status(500).json(err);
     }
 }
 
@@ -146,14 +113,14 @@ export const addReaction = async (req: Request, res: Response) => {
         );
 
         if (!thought) {
-            return res
+            res
                 .status(404)
                 .json({ message: 'No thought found with that ID :(' });
         }
 
-        return res.json(thought);
+        res.json(thought);
     } catch (err) {
-        return res.status(500).json(err);
+        res.status(500).json(err);
     }
 }
 
@@ -173,13 +140,13 @@ export const removeReaction = async (req: Request, res: Response) => {
         );
 
         if (!thought) {
-            return res
+            res
                 .status(404)
                 .json({ message: 'No thought found with that ID :(' });
         }
 
-        return res.json(thought);
+        res.json(thought);
     } catch (err) {
-        return res.status(500).json(err);
+        res.status(500).json(err);
     }
 }
