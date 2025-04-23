@@ -8,7 +8,7 @@
     "start": "npm run build && node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "preseed": "npm run build",
-    "seed": "npm run preseed && node dist/seed.js"
+    "seed": "npm run preseed && node dist/seeds/index.js"
   },
   "keywords": [],
   "author": "",

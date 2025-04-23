@@ -24,4 +24,4 @@ const db = () => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error('Database connection failed.');
     }
 });
-exports.default = db;
+exports.default = db();

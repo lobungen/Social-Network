@@ -12,14 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const connection_js_1 = __importDefault(require("../config/connection.js"));
 const index_js_1 = require("../models/index.js");
 const cleanDB_js_1 = __importDefault(require("./cleanDB.js"));
 const data_js_1 = require("./data.js");
 function seedDatabase() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield (0, connection_js_1.default)();
+            //await db();
             yield (0, cleanDB_js_1.default)();
             // Add thoughts to the collection and await the results
             const thoughts = yield index_js_1.Thought.insertMany(data_js_1.thoughtData);
@@ -36,3 +35,4 @@ function seedDatabase() {
         }
     });
 }
+seedDatabase();
