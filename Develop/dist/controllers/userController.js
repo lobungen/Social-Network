@@ -48,11 +48,8 @@ export const getUserById = async (req, res) => {
 * @returns a single User object
 */
 export const createUser = async (req, res) => {
-    const { user } = req.body;
     try {
-        const newUser = await User.create({
-            user
-        });
+        const newUser = await User.create(req.body);
         res.status(201).json(newUser);
     }
     catch (error) {
