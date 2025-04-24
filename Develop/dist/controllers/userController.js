@@ -68,8 +68,10 @@ export const updateUser = async (req, res) => {
         const user = await User.findOneAndUpdate({ _id: req.params.userId }, { $set: req.body }, { runValidators: true, new: true });
         if (!user) {
             res.status(404).json({ message: 'No user with this id!' });
+            return;
         }
         res.json(user);
+        return;
     }
     catch (error) {
         res.status(400).json({
