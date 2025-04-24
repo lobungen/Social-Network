@@ -1,11 +1,11 @@
-//import db from '../config/connection.js';
+import db from '../config/connection.js';
 import { User, Thought } from '../models/index.js';
 //import cleanDB from './cleanDB.js';
 import { userData, thoughtData } from './data.js';
 
 async function seedDatabase() {
   try {
-    //await db();
+    await db();
     //await cleanDB();
 
     // Add thoughts to the collection and await the results
