@@ -13,3 +13,16 @@ router
     .get(userController_js_1.getUserById)
     .put(userController_js_1.updateUser)
     .delete(userController_js_1.deleteUser);
+// /api/users/:userId/friends/:friendId
+// This route is used to add or delete a friend for a user
+router
+    .route('/:userId/friends/:friendId')
+    .post(userController_js_1.addFriend)
+    .delete(userController_js_1.deleteFriend);
+// /api/users/:userId/friends
+// This route is used to get all friends of a user
+router
+    .route('/:userId/friends')
+    .get(userController_js_1.getUserFriends)
+    .post(userController_js_1.addFriend)
+    .delete(userController_js_1.deleteFriend);

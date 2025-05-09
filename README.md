@@ -19,7 +19,9 @@ Build an API from scratch for a social network web application where users can s
 
 ## Video Submission
 
-[Video demo](https://app.screencastify.com/v3/watch/vAVnIg44GvUsfBI68D7w)
+[Video demo - Screencastify Link](https://app.screencastify.com/v3/watch/vAVnIg44GvUsfBI68D7w)
+
+[Video demo - Google Drive Link](https://drive.google.com/file/d/1pKrdoyH2WU9BoWjngwCg3f0rL8VSZEKz/view)
 
 ## Github Repo
 
