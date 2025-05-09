@@ -13,3 +13,8 @@ router.route('/:thoughtId').get(thoughtController_js_1.getThoughtById).delete(th
 router.route('/:thoughtId/reactions').post(thoughtController_js_1.addReaction);
 // /api/thoughts/:thoughtId/reactions/:reactionId
 router.route('/:thoughtId/reactions/:reactionId').delete(thoughtController_js_1.removeReaction);
+// /api/thoughts/:thoughtId/user/:userId
+router.route('/:thoughtId/user/:userId').post(thoughtController_js_1.addThoughtToUser).delete(thoughtController_js_1.removeThoughtFromUser);
+// /api/thoughts/:thoughtId/user/:userId/update
+router.route('/:thoughtId/user/:userId/update').put(thoughtController_js_1.updateThoughtForUser);
+
